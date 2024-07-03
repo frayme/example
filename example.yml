@@ -1,0 +1,35 @@
+stages:
+  - createvms
+  - autotest
+  - dropvms
+
+createvms:
+  stage: createvms
+  script:
+    - echo "Deploy vms"
+  artifacts:
+    paths:
+      - test/
+
+autotest:
+  stage: autotest
+  script:
+    - exit 1
+  allow_failure: true
+  needs:
+    - createvms
+
+.dropvms: &dropvms
+  stage: dropvms
+  script:
+    - echo "Drop vms"
+  needs:
+    - autotest
+
+dropvms_auto:
+  when: on_success
+  <<: *dropvms
+
+dropvms_manual:
+  when: manual
+  <<: *dropvms
